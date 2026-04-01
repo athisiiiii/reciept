@@ -618,7 +618,7 @@
     document.getElementById('receiptPreview').innerHTML = buildReceiptHTML(data, currentReceiptNo);
   }
 
-  // Generate PDF using jsPDF (canvas approach for clean output)
+  // Generate PDF — A4, clean mobile-friendly layout
   async function generatePDF() {
     const data = getFormData();
     const err = validate(data);
@@ -626,107 +626,169 @@
 
     currentReceiptNo = genReceiptNo();
 
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [105, 150] });
-    const W = 105;
+    // A4: 210 x 297 mm
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210;
+    const H = 297;
+    const PAD = 20; // side padding
+    const CW = W - PAD * 2; // content width = 170mm
 
-    // Header background
-    doc.setFillColor(30, 58, 95);
-    doc.rect(0, 0, W, 38, 'F');
+    // ── HEADER BAND ──────────────────────────────────────────
+    doc.setFillColor(15, 38, 68);
+    doc.rect(0, 0, W, 55, 'F');
 
-    // Institute name
+    // Accent bar at very top
+    doc.setFillColor(0, 180, 220);
+    doc.rect(0, 0, W, 3, 'F');
+
+    // Institute name — large, centered
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(22);
     doc.setTextColor(255, 255, 255);
-    doc.text('NEXTGEN COMPUTER INSTITUTE', W/2, 16, { align: 'center' });
+    doc.text('NEXTGEN COMPUTER INSTITUTE', W / 2, 24, { align: 'center' });
 
+    // Tagline
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(180, 210, 240);
-    doc.text('EXCELLENCE IN COMPUTER EDUCATION', W/2, 22, { align: 'center' });
+    doc.setFontSize(9);
+    doc.setTextColor(160, 200, 230);
+    doc.text('Excellence in Computer Education', W / 2, 33, { align: 'center' });
 
-    // Curved bottom of header (simulate with white rect)
+    // Thin separator line inside header
+    doc.setDrawColor(0, 180, 220);
+    doc.setLineWidth(0.3);
+    doc.line(PAD + 20, 38, W - PAD - 20, 38);
+
+    // "FEE RECEIPT" badge text
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(0, 212, 255);
+    doc.text('FEE RECEIPT', W / 2, 47, { align: 'center' });
+
+    // ── WHITE BODY AREA ───────────────────────────────────────
     doc.setFillColor(255, 255, 255);
-    doc.ellipse(W/2, 38, W*0.55, 6, 'F');
+    doc.rect(0, 55, W, H - 55, 'F');
 
-    // Fee Receipt title
+    // Receipt number — right aligned, small
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(100, 116, 139);
-    doc.text('FEE RECEIPT', W/2, 46, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(150, 160, 180);
+    doc.text('Receipt No: ' + currentReceiptNo, W - PAD, 66, { align: 'right' });
 
-    doc.setFont('courier', 'normal');
-    doc.setFontSize(6);
-    doc.setTextColor(148, 163, 184);
-    doc.text(currentReceiptNo, W/2, 51, { align: 'center' });
+    // Date issued — left aligned
+    const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+    doc.text('Issued: ' + today, PAD, 66);
 
-    // Divider
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.2);
+    // Thin line under meta
+    doc.setDrawColor(220, 228, 240);
+    doc.setLineWidth(0.3);
+    doc.line(PAD, 70, W - PAD, 70);
 
-    // Rows
+    // ── DETAIL ROWS ───────────────────────────────────────────
     const rows = [
-      ['Student Name', data.name],
+      ['Student Name',   data.name],
       ['Month Paid For', data.month],
-      ['Payment Date', formatDate(data.date)],
-      ['Receipt No.', currentReceiptNo],
+      ['Payment Date',   formatDate(data.date)],
+      ['Receipt No.',    currentReceiptNo],
     ];
 
-    let y = 57;
-    rows.forEach(([key, val]) => {
+    let y = 84;
+    const ROW_H = 22;
+    const labelX = PAD;
+    const valueX = W - PAD;
+
+    rows.forEach(([key, val], i) => {
+      // Alternating light row bg
+      if (i % 2 === 0) {
+        doc.setFillColor(247, 250, 253);
+        doc.rect(PAD, y - 7, CW, ROW_H, 'F');
+      }
+
+      // Key label
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(100, 116, 139);
-      doc.text(key.toUpperCase(), 12, y);
+      doc.setFontSize(9);
+      doc.setTextColor(120, 135, 155);
+      doc.text(key.toUpperCase(), labelX + 4, y + 1);
 
+      // Value — right side, bold, larger
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(30, 41, 59);
-      doc.text(val || '—', W - 12, y, { align: 'right' });
+      doc.setFontSize(11);
+      doc.setTextColor(20, 30, 50);
+      // Wrap long text if needed
+      const valStr = val || '—';
+      doc.text(valStr, valueX - 4, y + 1, { align: 'right', maxWidth: CW * 0.55 });
 
-      doc.setDrawColor(226, 232, 240);
-      doc.line(12, y + 3, W - 12, y + 3);
-      y += 11;
+      // Bottom border of row
+      doc.setDrawColor(220, 228, 240);
+      doc.setLineWidth(0.2);
+      doc.line(PAD, y + ROW_H - 9, W - PAD, y + ROW_H - 9);
+
+      y += ROW_H;
     });
 
-    // Amount box
-    doc.setFillColor(30, 58, 95);
-    doc.roundedRect(10, y + 2, W - 20, 18, 3, 3, 'F');
+    y += 8;
 
+    // ── AMOUNT BOX ────────────────────────────────────────────
+    // Outer rounded rect
+    doc.setFillColor(15, 38, 68);
+    doc.roundedRect(PAD, y, CW, 32, 4, 4, 'F');
+
+    // Left label
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(180, 210, 240);
-    doc.text('AMOUNT PAID', 18, y + 12);
+    doc.setFontSize(10);
+    doc.setTextColor(160, 200, 230);
+    doc.text('TOTAL AMOUNT PAID', PAD + 10, y + 13);
+
+    // Currency symbol separately (avoid encoding issues)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(0, 212, 255);
+    doc.text('INR', W - PAD - 10 - doc.getTextWidth('INR') - 2, y + 11, { align: 'left' });
+
+    // Amount value — large
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    const amtStr = Number(data.amount).toLocaleString('en-IN');
+    doc.text(amtStr, W - PAD - 10, y + 22, { align: 'right' });
+
+    y += 44;
+
+    // ── PAID STAMP ────────────────────────────────────────────
+    // Green rounded badge, centered
+    const stampW = 50; const stampH = 14;
+    const stampX = W / 2 - stampW / 2;
+    doc.setFillColor(236, 253, 245);
+    doc.setDrawColor(22, 163, 74);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(stampX, y, stampW, stampH, 3, 3, 'FD');
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.text('\u20B9 ' + Number(data.amount).toLocaleString('en-IN'), W - 18, y + 14, { align: 'right' });
+    doc.setFontSize(11);
+    doc.setTextColor(22, 163, 74);
+    doc.text('\u2713  PAYMENT RECEIVED', W / 2, y + 9.5, { align: 'center' });
 
     y += 26;
 
-    // Footer
-    doc.setFillColor(248, 250, 252);
-    doc.rect(0, y, W, 150 - y, 'F');
+    // ── FOOTER ────────────────────────────────────────────────
+    // Light footer background strip at bottom
+    doc.setFillColor(247, 250, 253);
+    doc.rect(0, H - 28, W, 28, 'F');
 
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineDash([1, 1]);
-    doc.line(10, y, W - 10, y);
+    doc.setDrawColor(220, 228, 240);
+    doc.setLineWidth(0.3);
+    doc.setLineDash([2, 2]);
+    doc.line(PAD, H - 28, W - PAD, H - 28);
     doc.setLineDash([]);
 
-    // PAID stamp
-    doc.setDrawColor(22, 163, 74);
-    doc.setLineWidth(0.5);
-    doc.roundedRect(W/2 - 14, y + 5, 28, 8, 2, 2);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
-    doc.setTextColor(22, 163, 74);
-    doc.text('\u2713 PAID', W/2, y + 10.5, { align: 'center' });
-
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6);
-    doc.setTextColor(148, 163, 184);
-    doc.text('Thank you for your payment', W/2, y + 20, { align: 'center' });
-    doc.text('This is a computer-generated receipt.', W/2, y + 25, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setTextColor(150, 160, 175);
+    doc.text('Thank you for your payment!', W / 2, H - 18, { align: 'center' });
+    doc.text('This is a computer-generated receipt and does not require a signature.', W / 2, H - 11, { align: 'center' });
+
+    // Accent bottom bar
+    doc.setFillColor(15, 38, 68);
+    doc.rect(0, H - 4, W, 4, 'F');
 
     doc.save(`Fee_Receipt_${data.name.replace(/\s+/g,'_')}_${data.month.replace(/\s+/g,'_')}.pdf`);
     showToast('PDF downloaded successfully!', '📄');
