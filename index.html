@@ -1,465 +1,770 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Fee Receipt</title>
-  <style>
-    :root {
-      --bg: #f5efe4;
-      --panel: #fffdf8;
-      --ink: #1f2937;
-      --muted: #6b7280;
-      --accent: #b45309;
-      --accent-dark: #92400e;
-      --line: #e5dccd;
-      --success: #166534;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nextgen Computer Institute — Fee Receipt Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --card: #161d2e;
+    --border: #1f2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --text: #e8f0fe;
+    --muted: #64748b;
+    --success: #10b981;
+    --warn: #f59e0b;
+  }
 
-    * {
-      box-sizing: border-box;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(180, 83, 9, 0.12), transparent 30%),
-        linear-gradient(180deg, #f6f0e5 0%, #efe6d6 100%);
-      min-height: 100vh;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    .page {
-      width: min(1100px, calc(100% - 32px));
-      margin: 32px auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 18px 50px rgba(31, 41, 55, 0.08);
-    }
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.one { width: 400px; height: 400px; background: rgba(0,212,255,0.07); top: -100px; right: -100px; }
+  .glow-orb.two { width: 300px; height: 300px; background: rgba(124,58,237,0.08); bottom: 100px; left: -80px; }
 
-    h1, h2 {
-      margin: 0 0 12px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
 
-    p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
 
-    label {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-    input {
-      width: 100%;
-      border: 1px solid #d9ccb7;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font: inherit;
-      background: #fff;
-    }
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
 
-    input:focus {
-      outline: 2px solid rgba(180, 83, 9, 0.2);
-      border-color: var(--accent);
-    }
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    animation: fadeUp 0.7s ease both 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .actions {
-      margin-top: 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent2));
+    opacity: 0.6;
+  }
 
-    button,
-    .link-btn {
-      border: 0;
-      border-radius: 999px;
-      padding: 12px 18px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-    button:hover,
-    .link-btn:hover {
-      transform: translateY(-1px);
-    }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 
-    .primary {
-      background: var(--accent);
-      color: #fff;
-    }
+  .field-group {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
 
-    .secondary {
-      background: #efe5d4;
-      color: var(--accent-dark);
-    }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 
-    .success {
-      background: #dcfce7;
-      color: var(--success);
-    }
+  label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+  }
 
-    .receipt-shell {
-      background: #fff;
-      border: 1px solid #eadfcf;
-      border-radius: 18px;
-      padding: 22px;
-    }
+  input, select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    appearance: none;
+  }
 
-    .receipt {
-      border: 2px solid #d6c3a7;
-      padding: 24px;
-      background:
-        linear-gradient(135deg, rgba(180, 83, 9, 0.07), transparent 28%),
-        #fffefb;
-    }
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
 
-    .receipt-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      border-bottom: 1px dashed #cbb391;
-      padding-bottom: 14px;
-      margin-bottom: 18px;
-    }
+  input::placeholder { color: #374151; }
 
-    .receipt-title {
-      font-size: 1.5rem;
-      color: var(--accent-dark);
-    }
+  select option { background: var(--surface); }
 
-    .receipt-subtitle {
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
+  .wa-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-    .receipt-meta {
-      text-align: right;
-      font-size: 0.95rem;
-    }
+  .wa-note::before { content: '🔒'; font-size: 11px; }
 
-    .receipt-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 18px;
-      margin-bottom: 18px;
-    }
+  /* Buttons */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
 
-    .receipt-item {
-      border-bottom: 1px solid #eee4d3;
-      padding-bottom: 8px;
-    }
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    letter-spacing: 0.03em;
+  }
 
-    .receipt-item strong,
-    .amount-box strong {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
 
-    .amount-box {
-      background: #fcf3e4;
-      border: 1px solid #eed7ad;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 18px;
-    }
+  .btn-pdf {
+    background: linear-gradient(135deg, #0ea5e9, var(--accent));
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.25);
+  }
 
-    .amount-box span {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--accent-dark);
-    }
+  .btn-pdf:hover { box-shadow: 0 6px 28px rgba(0,212,255,0.4); }
 
-    .receipt-note {
-      font-size: 0.92rem;
-      color: var(--muted);
-      border-top: 1px dashed #cbb391;
-      padding-top: 14px;
-    }
+  .btn-wa {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.25);
+  }
 
-    .status {
-      margin-top: 14px;
-      min-height: 24px;
-      font-size: 0.95rem;
-      color: var(--success);
-      font-weight: 600;
-    }
+  .btn-wa:hover { box-shadow: 0 6px 28px rgba(34,197,94,0.4); }
 
-    @media (max-width: 860px) {
-      .page,
-      .grid,
-      .receipt-grid {
-        grid-template-columns: 1fr;
-      }
+  /* Preview section */
+  .preview-wrap {
+    margin-top: 32px;
+    animation: fadeUp 0.5s ease both;
+  }
 
-      .receipt-header {
-        flex-direction: column;
-      }
+  .preview-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
 
-      .receipt-meta {
-        text-align: left;
-      }
-    }
-  </style>
+  /* Receipt styles (inside preview) */
+  #receiptPreview {
+    padding: 0;
+  }
+
+  .receipt-header {
+    background: linear-gradient(135deg, #1e3a5f, #0f2644);
+    color: white;
+    padding: 28px 32px 22px;
+    text-align: center;
+    position: relative;
+  }
+
+  .receipt-header::after {
+    content: '';
+    position: absolute;
+    bottom: -12px; left: 0; right: 0;
+    height: 24px;
+    background: white;
+    clip-path: ellipse(55% 100% at 50% 100%);
+  }
+
+  .receipt-inst-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: #fff;
+  }
+
+  .receipt-tagline {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 2px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .receipt-body {
+    background: #fff;
+    padding: 32px 32px 24px;
+    color: #1a1a2e;
+  }
+
+  .receipt-title {
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+
+  .receipt-no {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 24px;
+  }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    font-size: 0.88rem;
+  }
+
+  .receipt-row:last-of-type { border-bottom: none; }
+
+  .receipt-row .key {
+    color: #64748b;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .receipt-row .val {
+    font-weight: 600;
+    color: #1e293b;
+    text-align: right;
+  }
+
+  .receipt-amount-box {
+    background: linear-gradient(135deg, #1e3a5f, #0f2644);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .receipt-amount-label {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .receipt-amount-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: #fff;
+  }
+
+  .receipt-footer {
+    text-align: center;
+    padding: 16px 32px 24px;
+    background: #f8fafc;
+    border-top: 1px dashed #e2e8f0;
+  }
+
+  .receipt-stamp {
+    display: inline-block;
+    border: 2px solid #16a34a;
+    border-radius: 8px;
+    padding: 4px 16px;
+    color: #16a34a;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    transform: rotate(-2deg);
+    margin-bottom: 10px;
+  }
+
+  .receipt-note {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 0.85rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @keyframes fadeDown { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform: translateY(20px);  } to { opacity:1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .card { padding: 24px 18px; }
+    .btn-row { grid-template-columns: 1fr; }
+    h1 { font-size: 1.5rem; }
+  }
+</style>
 </head>
 <body>
-  <main class="page">
-    <section class="card">
-      <h1>Student Fee Receipt</h1>
-      <p>Fill in the payment details, generate the receipt instantly, then open WhatsApp with a ready-made message.</p>
+<div class="glow-orb one"></div>
+<div class="glow-orb two"></div>
 
-      <form id="feeForm">
-        <div class="grid">
-          <div class="field">
-            <label for="studentName">Student Name</label>
-            <input id="studentName" name="studentName" type="text" placeholder="Enter student name" required>
-          </div>
+<div class="wrapper">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-mark">
+      <div class="logo-icon">💻</div>
+      <span class="logo-text">NEXTGEN</span>
+    </div>
+    <h1>Fee Receipt Generator</h1>
+    <p class="subtitle">// Nextgen Computer Institute</p>
+  </div>
 
-          <div class="field">
-            <label for="studentClass">Class</label>
-            <input id="studentClass" name="studentClass" type="text" placeholder="Enter class" required>
-          </div>
+  <!-- Form Card -->
+  <div class="card">
+    <div class="section-label">Student Details</div>
 
-          <div class="field">
-            <label for="monthPaid">Month Paid</label>
-            <input id="monthPaid" name="monthPaid" type="text" placeholder="Example: April 2026" required>
-          </div>
+    <div class="field-group">
+      <div class="field">
+        <label>Student Name</label>
+        <input type="text" id="studentName" placeholder="e.g. Rahul Sharma" />
+      </div>
 
-          <div class="field">
-            <label for="amountPaid">Amount Paid</label>
-            <input id="amountPaid" name="amountPaid" type="number" min="0" step="0.01" placeholder="Enter amount" required>
-          </div>
+      <div class="field">
+        <label>Month Paid For</label>
+        <select id="monthPaid">
+          <option value="">— Select Month —</option>
+          <option>January 2025</option><option>February 2025</option>
+          <option>March 2025</option><option>April 2025</option>
+          <option>May 2025</option><option>June 2025</option>
+          <option>July 2025</option><option>August 2025</option>
+          <option>September 2025</option><option>October 2025</option>
+          <option>November 2025</option><option>December 2025</option>
+          <option>January 2026</option><option>February 2026</option>
+          <option>March 2026</option><option>April 2026</option>
+          <option>May 2026</option><option>June 2026</option>
+          <option>July 2026</option><option>August 2026</option>
+          <option>September 2026</option><option>October 2026</option>
+          <option>November 2026</option><option>December 2026</option>
+        </select>
+      </div>
 
-          <div class="field">
-            <label for="paymentDate">Payment Date</label>
-            <input id="paymentDate" name="paymentDate" type="date" required>
-          </div>
+      <div class="field">
+        <label>Amount Paid (₹)</label>
+        <input type="number" id="amount" placeholder="e.g. 1500" min="0" />
+      </div>
 
-          <div class="field">
-            <label for="phoneNumber">WhatsApp Number</label>
-            <input id="phoneNumber" name="phoneNumber" type="tel" placeholder="Example: 919876543210" required>
-          </div>
+      <div class="field">
+        <label>Payment Date</label>
+        <input type="date" id="paymentDate" />
+      </div>
+    </div>
 
-          <div class="field full">
-            <label for="schoolName">School / Institute Name</label>
-            <input id="schoolName" name="schoolName" type="text" placeholder="Enter your school name" required>
-          </div>
+    <div class="section-label">WhatsApp Delivery</div>
+
+    <div class="field-group">
+      <div class="field">
+        <label>WhatsApp Number</label>
+        <input type="tel" id="waNumber" placeholder="e.g. 919876543210 (with country code)" />
+        <span class="wa-note">Number is only used for sending — not included in the receipt</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-pdf" onclick="generatePDF()">
+        <span>📄</span> Download PDF
+      </button>
+      <button class="btn btn-wa" onclick="sendWhatsApp()">
+        <span>💬</span> Send via WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- Live Preview -->
+  <div class="preview-wrap" id="previewSection" style="display:none;">
+    <div class="section-label" style="margin-top:32px; color:var(--muted); font-size:0.65rem;">Receipt Preview</div>
+    <div class="preview-card">
+      <div id="receiptPreview"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const { jsPDF } = window.jspdf;
+
+  // Generate receipt number
+  function genReceiptNo() {
+    const now = new Date();
+    return 'NCI-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*9000)+1000);
+  }
+
+  let currentReceiptNo = genReceiptNo();
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+  }
+
+  function getFormData() {
+    return {
+      name: document.getElementById('studentName').value.trim(),
+      month: document.getElementById('monthPaid').value,
+      amount: document.getElementById('amount').value,
+      date: document.getElementById('paymentDate').value,
+      waNumber: document.getElementById('waNumber').value.trim()
+    };
+  }
+
+  function validate(data, needWA = false) {
+    if (!data.name) return 'Please enter the student name.';
+    if (!data.month) return 'Please select the month paid for.';
+    if (!data.amount || isNaN(data.amount) || Number(data.amount) <= 0) return 'Please enter a valid amount.';
+    if (!data.date) return 'Please select the payment date.';
+    if (needWA && !data.waNumber) return 'Please enter a WhatsApp number.';
+    return null;
+  }
+
+  function showToast(msg, emoji = '✅') {
+    const t = document.getElementById('toast');
+    t.innerHTML = emoji + ' ' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Build receipt HTML (used for preview only; PDF is drawn manually)
+  function buildReceiptHTML(data, receiptNo) {
+    return `
+      <div class="receipt-header">
+        <div class="receipt-inst-name">💻 NEXTGEN COMPUTER INSTITUTE</div>
+        <div class="receipt-tagline">Excellence in Computer Education</div>
+      </div>
+      <div class="receipt-body">
+        <div class="receipt-title">Fee Receipt</div>
+        <div class="receipt-no">${receiptNo}</div>
+
+        <div class="receipt-row">
+          <span class="key">Student Name</span>
+          <span class="val">${data.name}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="key">Month Paid For</span>
+          <span class="val">${data.month}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="key">Payment Date</span>
+          <span class="val">${formatDate(data.date)}</span>
+        </div>
+        <div class="receipt-row">
+          <span class="key">Receipt No.</span>
+          <span class="val" style="font-family:monospace;font-size:0.8em">${receiptNo}</span>
         </div>
 
-        <div class="actions">
-          <button type="submit" class="primary">Generate Receipt</button>
-          <button type="button" id="downloadBtn" class="secondary">Download PDF</button>
-          <a id="whatsappBtn" class="link-btn success" href="#" target="_blank" rel="noopener noreferrer">Open WhatsApp</a>
-        </div>
-        <div id="status" class="status"></div>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2>Receipt Preview</h2>
-      <p>This preview updates after submission and is the same section used for the PDF.</p>
-
-      <div class="receipt-shell">
-        <div id="receipt" class="receipt">
-          <div class="receipt-header">
-            <div>
-              <div id="previewSchool" class="receipt-title">Your Institute Name</div>
-              <div class="receipt-subtitle">Monthly Fee Payment Receipt</div>
-            </div>
-            <div class="receipt-meta">
-              <div><strong>Receipt No:</strong> <span id="previewReceiptNo">RCT-000000</span></div>
-              <div><strong>Date:</strong> <span id="previewDate">-</span></div>
-            </div>
+        <div class="receipt-amount-box">
+          <div>
+            <div class="receipt-amount-label">Amount Paid</div>
           </div>
-
-          <div class="receipt-grid">
-            <div class="receipt-item">
-              <strong>Student Name</strong>
-              <span id="previewName">-</span>
-            </div>
-            <div class="receipt-item">
-              <strong>Class</strong>
-              <span id="previewClass">-</span>
-            </div>
-            <div class="receipt-item">
-              <strong>Month Paid</strong>
-              <span id="previewMonth">-</span>
-            </div>
-            <div class="receipt-item">
-              <strong>WhatsApp Number</strong>
-              <span id="previewPhone">-</span>
-            </div>
-          </div>
-
-          <div class="amount-box">
-            <strong>Amount Received</strong>
-            <span id="previewAmount">Rs 0.00</span>
-          </div>
-
-          <div class="receipt-note">
-            This is a simple browser-generated receipt. After downloading it, attach the PDF in WhatsApp and send it to the parent or student.
-          </div>
+          <div class="receipt-amount-value">₹ ${Number(data.amount).toLocaleString('en-IN')}</div>
         </div>
       </div>
-    </section>
-  </main>
+      <div class="receipt-footer">
+        <div class="receipt-stamp">✓ PAID</div>
+        <div class="receipt-note">Thank you for your payment • Nextgen Computer Institute</div>
+        <div class="receipt-note" style="margin-top:4px">This is a computer-generated receipt.</div>
+      </div>
+    `;
+  }
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    const form = document.getElementById("feeForm");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const whatsappBtn = document.getElementById("whatsappBtn");
-    const statusBox = document.getElementById("status");
+  // Show live preview on any input change
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', updatePreview);
+    el.addEventListener('change', updatePreview);
+  });
 
-    const previewFields = {
-      school: document.getElementById("previewSchool"),
-      receiptNo: document.getElementById("previewReceiptNo"),
-      date: document.getElementById("previewDate"),
-      name: document.getElementById("previewName"),
-      studentClass: document.getElementById("previewClass"),
-      month: document.getElementById("previewMonth"),
-      phone: document.getElementById("previewPhone"),
-      amount: document.getElementById("previewAmount")
-    };
-
-    let currentReceiptNumber = "RCT-000000";
-
-    function generateReceiptNumber() {
-      return "RCT-" + Date.now().toString().slice(-6);
+  function updatePreview() {
+    const data = getFormData();
+    if (!data.name && !data.amount) {
+      document.getElementById('previewSection').style.display = 'none';
+      return;
     }
+    document.getElementById('previewSection').style.display = 'block';
+    document.getElementById('receiptPreview').innerHTML = buildReceiptHTML(data, currentReceiptNo);
+  }
 
-    function formatCurrency(value) {
-      const amount = Number(value || 0);
-      return "Rs " + amount.toFixed(2);
-    }
+  // Generate PDF using jsPDF (canvas approach for clean output)
+  async function generatePDF() {
+    const data = getFormData();
+    const err = validate(data);
+    if (err) { showToast(err, '⚠️'); return; }
 
-    function formatPhoneNumber(value) {
-      return value.replace(/[^\d]/g, "");
-    }
+    currentReceiptNo = genReceiptNo();
 
-    function buildWhatsappLink(data) {
-      const cleanPhone = formatPhoneNumber(data.phoneNumber);
-      const message =
-        "Hello, your monthly fee has been received.%0A" +
-        "Receipt No: " + currentReceiptNumber + "%0A" +
-        "Student: " + data.studentName + "%0A" +
-        "Class: " + data.studentClass + "%0A" +
-        "Month: " + data.monthPaid + "%0A" +
-        "Amount: " + formatCurrency(data.amountPaid) + "%0A" +
-        "Payment Date: " + data.paymentDate + "%0A" +
-        "Please find the receipt attached.";
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [105, 150] });
+    const W = 105;
 
-      return "https://wa.me/" + cleanPhone + "?text=" + message;
-    }
+    // Header background
+    doc.setFillColor(30, 58, 95);
+    doc.rect(0, 0, W, 38, 'F');
 
-    function updatePreview(data) {
-      currentReceiptNumber = generateReceiptNumber();
-      previewFields.school.textContent = data.schoolName;
-      previewFields.receiptNo.textContent = currentReceiptNumber;
-      previewFields.date.textContent = data.paymentDate;
-      previewFields.name.textContent = data.studentName;
-      previewFields.studentClass.textContent = data.studentClass;
-      previewFields.month.textContent = data.monthPaid;
-      previewFields.phone.textContent = data.phoneNumber;
-      previewFields.amount.textContent = formatCurrency(data.amountPaid);
-      whatsappBtn.href = buildWhatsappLink(data);
-    }
+    // Institute name
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(255, 255, 255);
+    doc.text('NEXTGEN COMPUTER INSTITUTE', W/2, 16, { align: 'center' });
 
-    function getFormData() {
-      const data = new FormData(form);
-      return {
-        studentName: data.get("studentName").trim(),
-        studentClass: data.get("studentClass").trim(),
-        monthPaid: data.get("monthPaid").trim(),
-        amountPaid: data.get("amountPaid").trim(),
-        paymentDate: data.get("paymentDate").trim(),
-        phoneNumber: data.get("phoneNumber").trim(),
-        schoolName: data.get("schoolName").trim()
-      };
-    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(180, 210, 240);
+    doc.text('EXCELLENCE IN COMPUTER EDUCATION', W/2, 22, { align: 'center' });
 
-    async function downloadReceipt() {
-      const receipt = document.getElementById("receipt");
-      const fileName = currentReceiptNumber + ".pdf";
+    // Curved bottom of header (simulate with white rect)
+    doc.setFillColor(255, 255, 255);
+    doc.ellipse(W/2, 38, W*0.55, 6, 'F');
 
-      const options = {
-        margin: 0.3,
-        filename: fileName,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-      };
+    // Fee Receipt title
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text('FEE RECEIPT', W/2, 46, { align: 'center' });
 
-      await html2pdf().set(options).from(receipt).save();
-    }
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(148, 163, 184);
+    doc.text(currentReceiptNo, W/2, 51, { align: 'center' });
 
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-      const data = getFormData();
-      updatePreview(data);
-      statusBox.textContent = "Receipt generated. Download the PDF, then open WhatsApp to send it.";
+    // Divider
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.2);
+
+    // Rows
+    const rows = [
+      ['Student Name', data.name],
+      ['Month Paid For', data.month],
+      ['Payment Date', formatDate(data.date)],
+      ['Receipt No.', currentReceiptNo],
+    ];
+
+    let y = 57;
+    rows.forEach(([key, val]) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text(key.toUpperCase(), 12, y);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(30, 41, 59);
+      doc.text(val || '—', W - 12, y, { align: 'right' });
+
+      doc.setDrawColor(226, 232, 240);
+      doc.line(12, y + 3, W - 12, y + 3);
+      y += 11;
     });
 
-    downloadBtn.addEventListener("click", async function () {
-      const data = getFormData();
-      if (!data.studentName || !data.studentClass || !data.monthPaid || !data.amountPaid || !data.paymentDate || !data.phoneNumber || !data.schoolName) {
-        statusBox.textContent = "Please fill in all fields before downloading the receipt.";
-        return;
-      }
+    // Amount box
+    doc.setFillColor(30, 58, 95);
+    doc.roundedRect(10, y + 2, W - 20, 18, 3, 3, 'F');
 
-      updatePreview(data);
-      await downloadReceipt();
-      statusBox.textContent = "PDF downloaded successfully.";
-    });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180, 210, 240);
+    doc.text('AMOUNT PAID', 18, y + 12);
 
-    whatsappBtn.addEventListener("click", function (event) {
-      const data = getFormData();
-      if (!data.studentName || !data.studentClass || !data.monthPaid || !data.amountPaid || !data.paymentDate || !data.phoneNumber || !data.schoolName) {
-        event.preventDefault();
-        statusBox.textContent = "Please fill in all fields before opening WhatsApp.";
-        return;
-      }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255);
+    doc.text('\u20B9 ' + Number(data.amount).toLocaleString('en-IN'), W - 18, y + 14, { align: 'right' });
 
-      updatePreview(data);
-      statusBox.textContent = "WhatsApp opened with a prefilled message. Attach the downloaded PDF and send it.";
-    });
+    y += 26;
 
-    document.getElementById("paymentDate").value = new Date().toISOString().split("T")[0];
-  </script>
+    // Footer
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, y, W, 150 - y, 'F');
+
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineDash([1, 1]);
+    doc.line(10, y, W - 10, y);
+    doc.setLineDash([]);
+
+    // PAID stamp
+    doc.setDrawColor(22, 163, 74);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(W/2 - 14, y + 5, 28, 8, 2, 2);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(22, 163, 74);
+    doc.text('\u2713 PAID', W/2, y + 10.5, { align: 'center' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(148, 163, 184);
+    doc.text('Thank you for your payment', W/2, y + 20, { align: 'center' });
+    doc.text('This is a computer-generated receipt.', W/2, y + 25, { align: 'center' });
+
+    doc.save(`Fee_Receipt_${data.name.replace(/\s+/g,'_')}_${data.month.replace(/\s+/g,'_')}.pdf`);
+    showToast('PDF downloaded successfully!', '📄');
+  }
+
+  function sendWhatsApp() {
+    const data = getFormData();
+    const err = validate(data, true);
+    if (err) { showToast(err, '⚠️'); return; }
+
+    // Clean number: remove +, spaces, dashes
+    let num = data.waNumber.replace(/[\s\-\+]/g, '');
+    if (!num.startsWith('91') && num.length === 10) num = '91' + num;
+
+    const msg = encodeURIComponent(
+`*Fee Receipt — Nextgen Computer Institute*
+
+Hello *${data.name}*,
+
+Your fee payment has been recorded. Here are the details:
+
+📋 *Receipt No:* ${currentReceiptNo}
+📅 *Month Paid:* ${data.month}
+💳 *Payment Date:* ${formatDate(data.date)}
+💰 *Amount Paid:* ₹${Number(data.amount).toLocaleString('en-IN')}
+
+✅ *Status: PAID*
+
+_Thank you for your timely payment!_
+_— Nextgen Computer Institute_`
+    );
+
+    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+    showToast('Opening WhatsApp...', '💬');
+  }
+
+  // Set today's date as default
+  document.getElementById('paymentDate').valueAsDate = new Date();
+</script>
 </body>
 </html>
