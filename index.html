@@ -754,18 +754,19 @@
     y += 44;
 
     // ── PAID STAMP ────────────────────────────────────────────
-    // Green rounded badge, centered
-    const stampW = 50; const stampH = 14;
-    const stampX = W / 2 - stampW / 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    const stampLabel = '\u2713  PAYMENT RECEIVED';
+    const textW = doc.getTextWidth(stampLabel);
+    const stampW = textW + 18;
+    const stampH = 16;
+    const stampX = (W - stampW) / 2;
     doc.setFillColor(236, 253, 245);
     doc.setDrawColor(22, 163, 74);
     doc.setLineWidth(0.8);
     doc.roundedRect(stampX, y, stampW, stampH, 3, 3, 'FD');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
     doc.setTextColor(22, 163, 74);
-    doc.text('\u2713  PAYMENT RECEIVED', W / 2, y + 9.5, { align: 'center' });
+    doc.text(stampLabel, W / 2, y + stampH / 2 + 2.2, { align: 'center' });
 
     y += 26;
 
