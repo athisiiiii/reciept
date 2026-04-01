@@ -16,8 +16,6 @@
     --accent2: #7c3aed;
     --text: #e8f0fe;
     --muted: #64748b;
-    --success: #10b981;
-    --warn: #f59e0b;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,7 +28,6 @@
     overflow-x: hidden;
   }
 
-  /* Animated background grid */
   body::before {
     content: '';
     position: fixed;
@@ -43,380 +40,79 @@
     z-index: 0;
   }
 
-  .glow-orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    z-index: 0;
-  }
+  .glow-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
   .glow-orb.one { width: 400px; height: 400px; background: rgba(0,212,255,0.07); top: -100px; right: -100px; }
   .glow-orb.two { width: 300px; height: 300px; background: rgba(124,58,237,0.08); bottom: 100px; left: -80px; }
 
-  .wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
+  .wrapper { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; padding: 48px 24px 80px; }
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 48px;
-    animation: fadeDown 0.6s ease both;
-  }
+  .header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.6s ease both; }
+  .logo-mark { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.05em; color: var(--accent); }
+  h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 2rem; line-height: 1.2; background: linear-gradient(135deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 8px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em; }
 
-  .logo-mark {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 36px; animation: fadeUp 0.7s ease both 0.15s; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent2)); opacity: 0.6; }
 
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-  }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  .logo-text {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-  }
+  .field-group { display: grid; gap: 18px; margin-bottom: 28px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field-hidden { display: none !important; }
 
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 2rem;
-    line-height: 1.2;
-    background: linear-gradient(135deg, #fff 30%, var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  .fee-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .fee-toggle-btn { padding: 13px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; text-align: center; letter-spacing: 0.02em; }
+  .fee-toggle-btn.active    { border-color: var(--accent);  background: rgba(0,212,255,0.08);   color: var(--accent);  box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+  .fee-toggle-btn.active-adm{ border-color: #a78bfa;        background: rgba(167,139,250,0.08); color: #a78bfa;        box-shadow: 0 0 0 3px rgba(167,139,250,0.1); }
 
-  .subtitle {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-top: 8px;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.05em;
-  }
+  label { font-size: 0.78rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; font-family: 'DM Mono', monospace; text-transform: uppercase; }
 
-  /* Card */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 36px;
-    animation: fadeUp 0.7s ease both 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent2));
-    opacity: 0.6;
-  }
-
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .field-group {
-    display: grid;
-    gap: 18px;
-    margin-bottom: 28px;
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  label {
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    font-family: 'DM Mono', monospace;
-    text-transform: uppercase;
-  }
-
-  input, select {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
-    padding: 12px 16px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
-    appearance: none;
-  }
-
-  input:focus, select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
-  }
-
+  input, select { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; padding: 12px 16px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; appearance: none; }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
   input::placeholder { color: #374151; }
-
   select option { background: var(--surface); }
 
-  .wa-note {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin-top: 4px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
+  .wa-note { font-size: 0.75rem; color: var(--muted); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
   .wa-note::before { content: '🔒'; font-size: 11px; }
 
-  /* Buttons */
-  .btn-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 8px;
-  }
-
-  .btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border: none;
-    transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
-    letter-spacing: 0.03em;
-  }
-
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; border-radius: 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none; transition: transform 0.15s, box-shadow 0.2s; letter-spacing: 0.03em; }
   .btn:hover { transform: translateY(-2px); }
   .btn:active { transform: translateY(0); }
-
-  .btn-pdf {
-    background: linear-gradient(135deg, #0ea5e9, var(--accent));
-    color: #000;
-    box-shadow: 0 4px 20px rgba(0,212,255,0.25);
-  }
-
+  .btn-pdf { background: linear-gradient(135deg, #0ea5e9, var(--accent)); color: #000; box-shadow: 0 4px 20px rgba(0,212,255,0.25); }
   .btn-pdf:hover { box-shadow: 0 6px 28px rgba(0,212,255,0.4); }
-
-  .btn-wa {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(34,197,94,0.25);
-  }
-
+  .btn-wa { background: linear-gradient(135deg, #16a34a, #22c55e); color: #fff; box-shadow: 0 4px 20px rgba(34,197,94,0.25); }
   .btn-wa:hover { box-shadow: 0 6px 28px rgba(34,197,94,0.4); }
 
-  /* Preview section */
-  .preview-wrap {
-    margin-top: 32px;
-    animation: fadeUp 0.5s ease both;
-  }
+  .preview-wrap { margin-top: 32px; animation: fadeUp 0.5s ease both; }
+  .preview-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  #receiptPreview { padding: 0; }
 
-  .preview-card {
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-
-  /* Receipt styles (inside preview) */
-  #receiptPreview {
-    padding: 0;
-  }
-
-  .receipt-header {
-    background: linear-gradient(135deg, #1e3a5f, #0f2644);
-    color: white;
-    padding: 28px 32px 22px;
-    text-align: center;
-    position: relative;
-  }
-
-  .receipt-header::after {
-    content: '';
-    position: absolute;
-    bottom: -12px; left: 0; right: 0;
-    height: 24px;
-    background: white;
-    clip-path: ellipse(55% 100% at 50% 100%);
-  }
-
-  .receipt-inst-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.3rem;
-    letter-spacing: 0.06em;
-    color: #fff;
-  }
-
-  .receipt-tagline {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.6);
-    margin-top: 2px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .receipt-body {
-    background: #fff;
-    padding: 32px 32px 24px;
-    color: #1a1a2e;
-  }
-
-  .receipt-title {
-    text-align: center;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #64748b;
-    margin-bottom: 6px;
-  }
-
-  .receipt-no {
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: #94a3b8;
-    margin-bottom: 24px;
-  }
-
-  .receipt-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px dashed #e2e8f0;
-    font-size: 0.88rem;
-  }
-
+  /* Receipt preview */
+  .receipt-header { background: linear-gradient(135deg, #1e3a5f, #0f2644); color: white; padding: 28px 32px 22px; text-align: center; position: relative; }
+  .receipt-header::after { content: ''; position: absolute; bottom: -12px; left: 0; right: 0; height: 24px; background: white; clip-path: ellipse(55% 100% at 50% 100%); }
+  .receipt-inst-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; letter-spacing: 0.06em; color: #fff; }
+  .receipt-tagline { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 2px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .receipt-body { background: #fff; padding: 32px 32px 24px; color: #1a1a2e; }
+  .receipt-badge { display: inline-block; padding: 3px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .badge-monthly   { background: rgba(0,180,220,0.1); color: #0ea5e9; }
+  .badge-admission { background: rgba(167,139,250,0.15); color: #7c3aed; }
+  .receipt-no { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: #94a3b8; margin-bottom: 24px; }
+  .receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.88rem; }
   .receipt-row:last-of-type { border-bottom: none; }
+  .receipt-row .key { color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+  .receipt-row .val { font-weight: 600; color: #1e293b; text-align: right; }
+  .receipt-amount-box { background: linear-gradient(135deg, #1e3a5f, #0f2644); border-radius: 12px; padding: 16px 20px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+  .receipt-amount-label { color: rgba(255,255,255,0.7); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .receipt-amount-value { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; color: #fff; }
+  .receipt-footer { text-align: center; padding: 16px 32px 24px; background: #f8fafc; border-top: 1px dashed #e2e8f0; }
+  .receipt-stamp { display: inline-block; border: 2px solid #16a34a; border-radius: 8px; padding: 4px 16px; color: #16a34a; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; transform: rotate(-2deg); margin-bottom: 10px; }
+  .receipt-note { font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.04em; }
 
-  .receipt-row .key {
-    color: #64748b;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-  }
-
-  .receipt-row .val {
-    font-weight: 600;
-    color: #1e293b;
-    text-align: right;
-  }
-
-  .receipt-amount-box {
-    background: linear-gradient(135deg, #1e3a5f, #0f2644);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin: 20px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .receipt-amount-label {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .receipt-amount-value {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.6rem;
-    color: #fff;
-  }
-
-  .receipt-footer {
-    text-align: center;
-    padding: 16px 32px 24px;
-    background: #f8fafc;
-    border-top: 1px dashed #e2e8f0;
-  }
-
-  .receipt-stamp {
-    display: inline-block;
-    border: 2px solid #16a34a;
-    border-radius: 8px;
-    padding: 4px 16px;
-    color: #16a34a;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    font-weight: 700;
-    transform: rotate(-2deg);
-    margin-bottom: 10px;
-  }
-
-  .receipt-note {
-    font-size: 0.7rem;
-    color: #94a3b8;
-    letter-spacing: 0.04em;
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 24px;
-    font-size: 0.85rem;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 999;
-    transition: transform 0.3s ease;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    white-space: nowrap;
-  }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 24px; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 8px; z-index: 999; transition: transform 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.4); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   @keyframes fadeDown { from { opacity:0; transform: translateY(-20px); } to { opacity:1; transform: translateY(0); } }
@@ -434,7 +130,6 @@
 <div class="glow-orb two"></div>
 
 <div class="wrapper">
-  <!-- Header -->
   <div class="header">
     <div class="logo-mark">
       <div class="logo-icon">💻</div>
@@ -444,17 +139,25 @@
     <p class="subtitle">// Nextgen Computer Institute</p>
   </div>
 
-  <!-- Form Card -->
   <div class="card">
-    <div class="section-label">Student Details</div>
+    <div class="section-label">Fee Type</div>
+    <div class="field-group">
+      <div class="field">
+        <div class="fee-toggle">
+          <button class="fee-toggle-btn active" id="btnMonthly" onclick="setFeeType('monthly')">📅 Monthly Fee</button>
+          <button class="fee-toggle-btn" id="btnAdmission" onclick="setFeeType('admission')">🎓 Admission Fee</button>
+        </div>
+      </div>
+    </div>
 
+    <div class="section-label">Student Details</div>
     <div class="field-group">
       <div class="field">
         <label>Student Name</label>
         <input type="text" id="studentName" placeholder="e.g. Rahul Sharma" />
       </div>
 
-      <div class="field">
+      <div class="field" id="monthField">
         <label>Month Paid For</label>
         <select id="monthPaid">
           <option value="">— Select Month —</option>
@@ -485,7 +188,6 @@
     </div>
 
     <div class="section-label">WhatsApp Delivery</div>
-
     <div class="field-group">
       <div class="field">
         <label>WhatsApp Number</label>
@@ -495,16 +197,11 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-pdf" onclick="generatePDF()">
-        <span>📄</span> Download PDF
-      </button>
-      <button class="btn btn-wa" onclick="sendWhatsApp()">
-        <span>💬</span> Send via WhatsApp
-      </button>
+      <button class="btn btn-pdf" onclick="generatePDF()"><span>📄</span> Download PDF</button>
+      <button class="btn btn-wa" onclick="sendWhatsApp()"><span>💬</span> Send via WhatsApp</button>
     </div>
   </div>
 
-  <!-- Live Preview -->
   <div class="preview-wrap" id="previewSection" style="display:none;">
     <div class="section-label" style="margin-top:32px; color:var(--muted); font-size:0.65rem;">Receipt Preview</div>
     <div class="preview-card">
@@ -513,16 +210,34 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
   const { jsPDF } = window.jspdf;
 
-  // Generate receipt number
+  let feeType = 'monthly';
+
+  function setFeeType(type) {
+    feeType = type;
+    const mBtn = document.getElementById('btnMonthly');
+    const aBtn = document.getElementById('btnAdmission');
+    const mField = document.getElementById('monthField');
+    if (type === 'monthly') {
+      mBtn.className = 'fee-toggle-btn active';
+      aBtn.className = 'fee-toggle-btn';
+      mField.classList.remove('field-hidden');
+    } else {
+      mBtn.className = 'fee-toggle-btn';
+      aBtn.className = 'fee-toggle-btn active-adm';
+      mField.classList.add('field-hidden');
+    }
+    updatePreview();
+  }
+
   function genReceiptNo() {
     const now = new Date();
-    return 'NCI-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*9000)+1000);
+    const prefix = feeType === 'admission' ? 'NCI-ADM' : 'NCI';
+    return prefix + '-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*9000)+1000);
   }
 
   let currentReceiptNo = genReceiptNo();
@@ -535,6 +250,7 @@
 
   function getFormData() {
     return {
+      feeType,
       name: document.getElementById('studentName').value.trim(),
       month: document.getElementById('monthPaid').value,
       amount: document.getElementById('amount').value,
@@ -545,7 +261,7 @@
 
   function validate(data, needWA = false) {
     if (!data.name) return 'Please enter the student name.';
-    if (!data.month) return 'Please select the month paid for.';
+    if (data.feeType === 'monthly' && !data.month) return 'Please select the month paid for.';
     if (!data.amount || isNaN(data.amount) || Number(data.amount) <= 0) return 'Please enter a valid amount.';
     if (!data.date) return 'Please select the payment date.';
     if (needWA && !data.waNumber) return 'Please enter a WhatsApp number.';
@@ -559,38 +275,26 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
-  // Build receipt HTML (used for preview only; PDF is drawn manually)
   function buildReceiptHTML(data, receiptNo) {
+    const isAdm = data.feeType === 'admission';
+    const feeLabel = isAdm ? 'Admission Fee' : 'Monthly Fee';
+    const badgeClass = isAdm ? 'badge-admission' : 'badge-monthly';
+    const monthRow = !isAdm ? `<div class="receipt-row"><span class="key">Month Paid For</span><span class="val">${data.month}</span></div>` : '';
     return `
       <div class="receipt-header">
         <div class="receipt-inst-name">💻 NEXTGEN COMPUTER INSTITUTE</div>
         <div class="receipt-tagline">Excellence in Computer Education</div>
       </div>
       <div class="receipt-body">
-        <div class="receipt-title">Fee Receipt</div>
+        <div style="text-align:center"><span class="receipt-badge ${badgeClass}">${feeLabel} Receipt</span></div>
         <div class="receipt-no">${receiptNo}</div>
-
-        <div class="receipt-row">
-          <span class="key">Student Name</span>
-          <span class="val">${data.name}</span>
-        </div>
-        <div class="receipt-row">
-          <span class="key">Month Paid For</span>
-          <span class="val">${data.month}</span>
-        </div>
-        <div class="receipt-row">
-          <span class="key">Payment Date</span>
-          <span class="val">${formatDate(data.date)}</span>
-        </div>
-        <div class="receipt-row">
-          <span class="key">Receipt No.</span>
-          <span class="val" style="font-family:monospace;font-size:0.8em">${receiptNo}</span>
-        </div>
-
+        <div class="receipt-row"><span class="key">Student Name</span><span class="val">${data.name}</span></div>
+        ${monthRow}
+        <div class="receipt-row"><span class="key">Fee Type</span><span class="val">${feeLabel}</span></div>
+        <div class="receipt-row"><span class="key">Payment Date</span><span class="val">${formatDate(data.date)}</span></div>
+        <div class="receipt-row"><span class="key">Receipt No.</span><span class="val" style="font-family:monospace;font-size:0.8em">${receiptNo}</span></div>
         <div class="receipt-amount-box">
-          <div>
-            <div class="receipt-amount-label">Amount Paid</div>
-          </div>
+          <div class="receipt-amount-label">Amount Paid</div>
           <div class="receipt-amount-value">₹ ${Number(data.amount).toLocaleString('en-IN')}</div>
         </div>
       </div>
@@ -598,11 +302,9 @@
         <div class="receipt-stamp">✓ PAID</div>
         <div class="receipt-note">Thank you for your payment • Nextgen Computer Institute</div>
         <div class="receipt-note" style="margin-top:4px">This is a computer-generated receipt.</div>
-      </div>
-    `;
+      </div>`;
   }
 
-  // Show live preview on any input change
   document.querySelectorAll('input, select').forEach(el => {
     el.addEventListener('input', updatePreview);
     el.addEventListener('change', updatePreview);
@@ -610,15 +312,11 @@
 
   function updatePreview() {
     const data = getFormData();
-    if (!data.name && !data.amount) {
-      document.getElementById('previewSection').style.display = 'none';
-      return;
-    }
+    if (!data.name && !data.amount) { document.getElementById('previewSection').style.display = 'none'; return; }
     document.getElementById('previewSection').style.display = 'block';
     document.getElementById('receiptPreview').innerHTML = buildReceiptHTML(data, currentReceiptNo);
   }
 
-  // Generate PDF — A4, clean mobile-friendly layout
   async function generatePDF() {
     const data = getFormData();
     const err = validate(data);
@@ -626,139 +324,100 @@
 
     currentReceiptNo = genReceiptNo();
 
-    // A4: 210 x 297 mm
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const W = 210;
-    const H = 297;
-    const PAD = 20; // side padding
-    const CW = W - PAD * 2; // content width = 170mm
+    const isAdm = data.feeType === 'admission';
+    const feeLabel = isAdm ? 'Admission Fee' : 'Monthly Fee';
+    const headerLabel = isAdm ? 'ADMISSION FEE RECEIPT' : 'FEE RECEIPT';
+    const accentR = isAdm ? 120 : 0;
+    const accentG = isAdm ? 80  : 180;
+    const accentB = isAdm ? 220 : 220;
 
-    // ── HEADER BAND ──────────────────────────────────────────
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210, H = 297, PAD = 20, CW = W - PAD * 2;
+
+    // Header band
     doc.setFillColor(15, 38, 68);
     doc.rect(0, 0, W, 55, 'F');
 
-    // Accent bar at very top
-    doc.setFillColor(0, 180, 220);
+    doc.setFillColor(accentR, accentG, accentB);
     doc.rect(0, 0, W, 3, 'F');
 
-    // Institute name — large, centered
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(22);
     doc.setTextColor(255, 255, 255);
     doc.text('NEXTGEN COMPUTER INSTITUTE', W / 2, 24, { align: 'center' });
 
-    // Tagline
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(160, 200, 230);
     doc.text('Excellence in Computer Education', W / 2, 33, { align: 'center' });
 
-    // Thin separator line inside header
-    doc.setDrawColor(0, 180, 220);
+    doc.setDrawColor(accentR, accentG, accentB);
     doc.setLineWidth(0.3);
     doc.line(PAD + 20, 38, W - PAD - 20, 38);
 
-    // "FEE RECEIPT" badge text
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.setTextColor(0, 212, 255);
-    doc.text('FEE RECEIPT', W / 2, 47, { align: 'center' });
+    doc.setTextColor(accentR, accentG, accentB);
+    doc.text(headerLabel, W / 2, 47, { align: 'center' });
 
-    // ── WHITE BODY AREA ───────────────────────────────────────
+    // White body
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 55, W, H - 55, 'F');
 
-    // Receipt number — right aligned, small
+    // Meta row
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(150, 160, 180);
     doc.text('Receipt No: ' + currentReceiptNo, W - PAD, 66, { align: 'right' });
-
-    // Date issued — left aligned
     const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
     doc.text('Issued: ' + today, PAD, 66);
 
-    // Thin line under meta
     doc.setDrawColor(220, 228, 240);
     doc.setLineWidth(0.3);
     doc.line(PAD, 70, W - PAD, 70);
 
-    // ── DETAIL ROWS ───────────────────────────────────────────
+    // Detail rows
     const rows = [
-      ['Student Name',   data.name],
-      ['Month Paid For', data.month],
-      ['Payment Date',   formatDate(data.date)],
-      ['Receipt No.',    currentReceiptNo],
+      ['Student Name', data.name],
+      ...(!isAdm ? [['Month Paid For', data.month]] : []),
+      ['Fee Type', feeLabel],
+      ['Payment Date', formatDate(data.date)],
+      ['Receipt No.', currentReceiptNo],
     ];
 
     let y = 84;
     const ROW_H = 22;
-    const labelX = PAD;
-    const valueX = W - PAD;
 
     rows.forEach(([key, val], i) => {
-      // Alternating light row bg
-      if (i % 2 === 0) {
-        doc.setFillColor(247, 250, 253);
-        doc.rect(PAD, y - 7, CW, ROW_H, 'F');
-      }
-
-      // Key label
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(120, 135, 155);
-      doc.text(key.toUpperCase(), labelX + 4, y + 1);
-
-      // Value — right side, bold, larger
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(20, 30, 50);
-      // Wrap long text if needed
-      const valStr = val || '—';
-      doc.text(valStr, valueX - 4, y + 1, { align: 'right', maxWidth: CW * 0.55 });
-
-      // Bottom border of row
-      doc.setDrawColor(220, 228, 240);
-      doc.setLineWidth(0.2);
+      if (i % 2 === 0) { doc.setFillColor(247, 250, 253); doc.rect(PAD, y - 7, CW, ROW_H, 'F'); }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(120, 135, 155);
+      doc.text(key.toUpperCase(), PAD + 4, y + 1);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(20, 30, 50);
+      doc.text(val || '—', W - PAD - 4, y + 1, { align: 'right', maxWidth: CW * 0.55 });
+      doc.setDrawColor(220, 228, 240); doc.setLineWidth(0.2);
       doc.line(PAD, y + ROW_H - 9, W - PAD, y + ROW_H - 9);
-
       y += ROW_H;
     });
 
     y += 8;
 
-    // ── AMOUNT BOX ────────────────────────────────────────────
-    // Outer rounded rect
+    // Amount box
     doc.setFillColor(15, 38, 68);
     doc.roundedRect(PAD, y, CW, 32, 4, 4, 'F');
-
-    // Left label
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(160, 200, 230);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(160, 200, 230);
     doc.text('TOTAL AMOUNT PAID', PAD + 10, y + 13);
-
-    // Currency symbol separately (avoid encoding issues)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(0, 212, 255);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(accentR, accentG, accentB);
     doc.text('INR', W - PAD - 10 - doc.getTextWidth('INR') - 2, y + 11, { align: 'left' });
-
-    // Amount value — large
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
-    const amtStr = Number(data.amount).toLocaleString('en-IN');
-    doc.text(amtStr, W - PAD - 10, y + 22, { align: 'right' });
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(255, 255, 255);
+    doc.text(Number(data.amount).toLocaleString('en-IN'), W - PAD - 10, y + 22, { align: 'right' });
 
     y += 44;
 
-    // ── PAID STAMP ────────────────────────────────────────────
+    // Paid stamp — dynamic width
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    const stampLabel = 'PAYMENT RECEIVED';
-    const textW = doc.getTextWidth(stampLabel);
-    const stampW = textW + 18;
+    const stampLabel = '\u2713  PAYMENT RECEIVED';
+    const stampW = doc.getTextWidth(stampLabel) + 18;
     const stampH = 16;
     const stampX = (W - stampW) / 2;
     doc.setFillColor(236, 253, 245);
@@ -768,30 +427,20 @@
     doc.setTextColor(22, 163, 74);
     doc.text(stampLabel, W / 2, y + stampH / 2 + 2.2, { align: 'center' });
 
-    y += 26;
-
-    // ── FOOTER ────────────────────────────────────────────────
-    // Light footer background strip at bottom
+    // Footer
     doc.setFillColor(247, 250, 253);
     doc.rect(0, H - 28, W, 28, 'F');
-
-    doc.setDrawColor(220, 228, 240);
-    doc.setLineWidth(0.3);
-    doc.setLineDash([2, 2]);
+    doc.setDrawColor(220, 228, 240); doc.setLineWidth(0.3); doc.setLineDash([2, 2]);
     doc.line(PAD, H - 28, W - PAD, H - 28);
     doc.setLineDash([]);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(150, 160, 175);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(150, 160, 175);
     doc.text('Thank you for your payment!', W / 2, H - 18, { align: 'center' });
     doc.text('This is a computer-generated receipt and does not require a signature.', W / 2, H - 11, { align: 'center' });
-
-    // Accent bottom bar
     doc.setFillColor(15, 38, 68);
     doc.rect(0, H - 4, W, 4, 'F');
 
-    doc.save(`Fee_Receipt_${data.name.replace(/\s+/g,'_')}_${data.month.replace(/\s+/g,'_')}.pdf`);
+    const suffix = isAdm ? 'Admission' : (data.month || '').replace(/\s+/g,'_');
+    doc.save(`Fee_Receipt_${data.name.replace(/\s+/g,'_')}_${suffix}.pdf`);
     showToast('PDF downloaded successfully!', '📄');
   }
 
@@ -800,20 +449,23 @@
     const err = validate(data, true);
     if (err) { showToast(err, '⚠️'); return; }
 
-    // Clean number: remove +, spaces, dashes
     let num = data.waNumber.replace(/[\s\-\+]/g, '');
     if (!num.startsWith('91') && num.length === 10) num = '91' + num;
 
+    const isAdm = data.feeType === 'admission';
+    const feeLabel = isAdm ? 'Admission Fee' : 'Monthly Fee';
+    const monthLine = !isAdm ? `📅 *Month Paid:* ${data.month}\n` : '';
+
     const msg = encodeURIComponent(
-`*Fee Receipt — Nextgen Computer Institute*
+`*${feeLabel} Receipt — Nextgen Computer Institute*
 
 Hello *${data.name}*,
 
-Your fee payment has been recorded. Here are the details:
+Your ${feeLabel.toLowerCase()} payment has been recorded. Here are the details:
 
 📋 *Receipt No:* ${currentReceiptNo}
-📅 *Month Paid:* ${data.month}
-💳 *Payment Date:* ${formatDate(data.date)}
+🏷️ *Fee Type:* ${feeLabel}
+${monthLine}💳 *Payment Date:* ${formatDate(data.date)}
 💰 *Amount Paid:* ₹${Number(data.amount).toLocaleString('en-IN')}
 
 ✅ *Status: PAID*
@@ -826,7 +478,6 @@ _— Nextgen Computer Institute_`
     showToast('Opening WhatsApp...', '💬');
   }
 
-  // Set today's date as default
   document.getElementById('paymentDate').valueAsDate = new Date();
 </script>
 </body>
